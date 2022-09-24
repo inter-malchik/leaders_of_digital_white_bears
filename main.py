@@ -1,8 +1,12 @@
+import os
 import sys
 
-from PyQt5.QtWidgets import QApplication, QFileDialog, QMainWindow
+from PyQt5.QtWidgets import QApplication, QFileDialog, QMainWindow, QLabel
+from PyQt5.QtGui import QPixmap
+from PyQt5.QtCore import QSize
 
 from gui import Ui_MainWindow
+from slider import Ui_MainWindow as SliderWindow
 
 
 class Window(QMainWindow, Ui_MainWindow):
@@ -10,11 +14,14 @@ class Window(QMainWindow, Ui_MainWindow):
         super().__init__(parent)
         self.setupUi(self)
         self.connectSignalsSlots()
+        self.setFixedSize(QSize(492, 308))
 
     def connectSignalsSlots(self):
         self.fileButton.clicked.connect(self.create_choosing_file)
         self.directoryButton.clicked.connect(self.create_choosing_dir)
         self.handlerButton.clicked.connect(self.handler)
+        self.fileButton_2.clicked.connect(self.create_choosing_file_2)
+        self.directoryButton_2.clicked.connect(self.create_choosing_dir_2)
 
     def create_choosing_file(self):
         file_window = QFileDialog()
@@ -26,10 +33,70 @@ class Window(QMainWindow, Ui_MainWindow):
         dirpath = dir_window.getExistingDirectoryUrl()
         self.lineEdit.setText(dirpath.toString()[8:])
 
+    def create_choosing_file_2(self):
+        file_window = QFileDialog()
+        filepath = file_window.getOpenFileUrl()
+        self.saveToLineEdit.setText(filepath[0].toString()[8:])
+
+    def create_choosing_dir_2(self):
+        dir_window = QFileDialog()
+        dirpath = dir_window.getExistingDirectoryUrl()
+        self.saveToLineEdit.setText(dirpath.toString()[8:])
+
     def handler(self):
-        print(self.lineEdit.text())
+        self.close()
+        self.slider_wind = Slider(self.lineEdit.text())
+        self.slider_wind.show()
 
 
+class Slider(QMainWindow, SliderWindow):
+    def __init__(self, path, parent=None):
+        super().__init__(parent)
+        self.setupUi(self)
+        self.connectSignalsSlots()
+        self.set_path(path)
+        self.setFixedSize(QSize(986, 563))
+        self.set_first_photo()
+
+    @classmethod
+    def set_path(cls, path):
+        cls.files = os.listdir(path)
+        cls.files.sort()
+        cls.pointer = 0
+        cls.path = path
+
+    def next(self):
+        if self.pointer!=len(self.files):
+            path = self.path + '/' + self.files[self.pointer]
+            pixmap = QPixmap(path)
+            self.lbl.setPixmap(pixmap)
+            self.pointer += 1
+
+    def prev(self):
+        if self.pointer!=0:
+            self.pointer -= 1
+            path = self.path + '/' + self.files[self.pointer]
+            pixmap = QPixmap(path)
+            self.lbl.setPixmap(pixmap)
+
+
+    def connectSignalsSlots(self):
+        self.nextButton.clicked.connect(self.next)
+        self.prevButton.clicked.connect(self.prev)
+        self.backButton.clicked.connect(self.back)
+
+    def set_first_photo(self):
+        self.lbl = QLabel(self)
+        path = self.path + '/' + self.files[self.pointer]
+        pixmap = QPixmap(path)
+        self.lbl.setPixmap(pixmap)
+        self.photoLayot.addWidget(self.lbl)
+        self.pointer += 1
+
+    def back(self):
+        self.close()
+        self.main = Window()
+        self.main.show()
 
 
 
