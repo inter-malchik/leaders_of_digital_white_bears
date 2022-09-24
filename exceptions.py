@@ -12,3 +12,9 @@ class folder_data(Exception):
                    f"Возможно папка {folder_path} содержит другие папки или файлы, которые не являются изображениями\"" \
                    f"форматов .png и .bmp"
         exception_window.throw_error_window(_message, 'Ошибка выполнения')
+
+class cant_convert_file_to_jpg(Exception):
+    def __init__(self, file_path):
+        _message = f"Файл {file_path} не может быть конвертирован в jpg.\n" \
+                   f"Вы можете удалить этот файл и запустить обработку заново."
+        exception_window.throw_error_window(_message, 'Ошибка конвертации данных')

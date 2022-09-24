@@ -10,9 +10,6 @@ def convert_to_jpeg(old_path: str):
 
     rgb_image.save(new_path)
 
-
-    return new_path
-
     os.remove(old_path)
 
     return new_path

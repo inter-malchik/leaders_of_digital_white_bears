@@ -1,5 +1,4 @@
 import PIL
-import numpy as np
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
@@ -20,7 +19,7 @@ class BoxCoords:
 
 @dataclass
 class PhotoData:
-    bear_boxes: list  # list of ccordinates
+    markup_path: str
     image_path: str
     date_of_creation: dt.datetime
     date_of_analysis: dt.datetime = dt.datetime.now()
@@ -76,14 +75,18 @@ def add_meta(image, image_path_orig='', date_submission='', date_photo_made=''):
 
 
 def process_image(photo_data: PhotoData):
-    final_box_coords = get_zoom_rect(photo_data.bear_boxes)
-    photo_data.bear_boxes = [final_box_coords]
+    bear_boxes = [] #get bear boxes
 
     image = Image.open(photo_data.image_path)
 
-    image.crop((final_box_coords.min_x, final_box_coords.max_y, final_box_coords.max_x, final_box_coords.min_y))
+    if bear_boxes:
+        final_box_coords = get_zoom_rect(bear_boxes)
 
-    image.save(photo_data.image_path)
+        bear_boxes = [final_box_coords]
+
+        image.crop((final_box_coords.min_x, final_box_coords.max_y, final_box_coords.max_x, final_box_coords.min_y))
+
+        image.save(photo_data.image_path)
 
     return add_meta(image,
                     image_path_orig=photo_data.image_path,
