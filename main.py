@@ -16,7 +16,7 @@ class Window(QMainWindow, Ui_MainWindow):
         super().__init__(parent)
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground, True)
-        self.setStyleSheet(Stylesheet)
+        # self.setStyleSheet(Stylesheet)
         effect = QGraphicsDropShadowEffect(self)
         effect.setBlurRadius(12)
         effect.setOffset(2, 2)
@@ -87,7 +87,7 @@ class Slider(QMainWindow, SliderWindow):
         self.setWindowTitle('Найденные медведи')
         self.setWindowFlags(Qt.FramelessWindowHint)
         self.setAttribute(Qt.WA_TranslucentBackground, True)
-        self.setStyleSheet(Stylesheet)
+        # self.setStyleSheet(Stylesheet)
         effect = QGraphicsDropShadowEffect(self)
         effect.setBlurRadius(12)
         effect.setOffset(2, 2)
@@ -141,6 +141,8 @@ class Slider(QMainWindow, SliderWindow):
         self.close()
         self.main = Window()
         self.main.show()
+
+
 
 
 if __name__ == "__main__":
