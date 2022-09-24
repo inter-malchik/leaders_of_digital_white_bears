@@ -1,7 +1,6 @@
 import sys
 
 from PyQt5.QtWidgets import QApplication, QFileDialog, QMainWindow
-from PyQt5 import QtGui
 
 from gui import Ui_MainWindow
 
@@ -13,13 +12,26 @@ class Window(QMainWindow, Ui_MainWindow):
         self.connectSignalsSlots()
 
     def connectSignalsSlots(self):
-        self.pushButton.clicked.connect(self.create_choosing_file)
+        self.fileButton.clicked.connect(self.create_choosing_file)
+        self.directoryButton.clicked.connect(self.create_choosing_dir)
+        self.handlerButton.clicked.connect(self.handler)
 
     def create_choosing_file(self):
         file_window = QFileDialog()
         filepath = file_window.getOpenFileUrl()
-        print(filepath)
-        self.lineEdit.setText(filepath[0].toString())
+        self.lineEdit.setText(filepath[0].toString()[8:])
+
+    def create_choosing_dir(self):
+        dir_window = QFileDialog()
+        dirpath = dir_window.getExistingDirectoryUrl()
+        self.lineEdit.setText(dirpath.toString()[8:])
+
+    def handler(self):
+        print(self.lineEdit.text())
+
+
+
+
 
 
 
