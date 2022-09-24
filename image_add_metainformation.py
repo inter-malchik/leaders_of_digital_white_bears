@@ -38,7 +38,6 @@ class PhotoData:
         f.close()
 
 
-
 def get_zoom_rect(bear_boxes: list):
     _min_x = _min_y = math.inf
     _max_x = _max_y = -math.inf
@@ -54,7 +53,7 @@ def get_zoom_rect(bear_boxes: list):
 
 def add_meta(image, image_path_orig='', date_submission='', date_photo_made=''):
     im_x, im_y = image.size()
-    
+
     image_bottom = PIL.Image.new("RGB", (im_x, 500), (0, 0, 0))
 
     I1 = ImageDraw.Draw(image_bottom)
@@ -89,21 +88,16 @@ def add_meta(image, image_path_orig='', date_submission='', date_photo_made=''):
 
 
 def process_image(photo_data: PhotoData):
-    bear_boxes = [] #get bear boxes
+    meta_images = []
 
-    image = Image.open(photo_data.image_path)
+    for i, box in enumerate(photo_data.bear_boxes):
+        image = Image.open(photo_data.image_path)
+        image.crop((box.min_x, box.max_y, box.max_x, box.min_y))
+        _image_path = f"photo_data.image_path{i}"
+        image.save(_image_path)
+        meta_images.append(add_meta(image,
+                                    image_path_orig=photo_data.image_path,
+                                    date_submission=str(photo_data.date_of_creation),
+                                    date_photo_made=str(photo_data.date_of_analysis)))
 
-    if bear_boxes:
-        final_box_coords = get_zoom_rect(bear_boxes)
-
-        bear_boxes = [final_box_coords]
-
-        image.crop((final_box_coords.min_x, final_box_coords.max_y, final_box_coords.max_x, final_box_coords.min_y))
-
-        image.save(photo_data.image_path)
-
-    return add_meta(image,
-                    image_path_orig=photo_data.image_path,
-                    date_submission=str(photo_data.date_of_creation),
-                    date_photo_made=str(photo_data.date_of_analysis))
-
+    return meta_images
