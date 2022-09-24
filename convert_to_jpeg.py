@@ -1,4 +1,5 @@
 from PIL import Image
+import os
 
 def convert_to_jpeg(old_path: str):
     image = Image.open(old_path)
@@ -9,5 +10,9 @@ def convert_to_jpeg(old_path: str):
 
     rgb_image.save(new_path)
 
+
     return new_path
 
+    os.remove(old_path)
+
+    return new_path
