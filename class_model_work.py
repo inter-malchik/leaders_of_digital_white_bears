@@ -66,8 +66,13 @@ class ModelWork:
 
             img_path = data_folder_path + '\\' + file_name
 
+            # getting directory
+            dirinfo = str(information["parent_directory"])
+            while dirinfo.count("\\") > 2:
+                dirinfo = dirinfo[dirinfo.find("\\")+1:]
 
-            temp_2 = PhotoData(information["markup_path"], img_path, datetime.fromtimestamp(os.path.getmtime(img_path)), information["processing_date"], [])
+
+            temp_2 = PhotoData(information["markup_path"], img_path, dirinfo, datetime.fromtimestamp(os.path.getmtime(img_path)), information["processing_date"], [])
 
             temp_2.scan_bear_boxes(information["markup_path"])
 

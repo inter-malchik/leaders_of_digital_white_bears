@@ -29,6 +29,7 @@ class BoxCoords:
 class PhotoData:
     markup_path: str
     image_path: str
+    image_dir: str
     date_of_creation: dt.datetime
     date_of_analysis: dt.datetime = dt.datetime.now()
     bear_boxes: list = dataclasses.field(default_factory=list)
@@ -57,8 +58,8 @@ def get_zoom_rect(bear_boxes: list):
 def add_meta(image, image_path_orig='', date_submission='', date_photo_made=''):
     im_x, im_y = image.size
 
-    bottom_cum_size = math.ceil(im_y*0.4)
-    font_size = im_x * 0.05
+    bottom_cum_size = math.ceil(im_y*0.2)
+    font_size = math.ceil(im_x * 0.03)
 
     image_bottom = PIL.Image.new("RGB", (im_x, bottom_cum_size), (0, 0, 0))
 
@@ -99,10 +100,16 @@ def process_image(photo_data: PhotoData):
     for i, box in enumerate(photo_data.bear_boxes):
         image = Image.open(photo_data.image_path)
         image = image.crop((box.min_x, box.min_y, box.max_x, box.max_y))
-        #_image_path = f"{photo_data.image_path[:-4]}{i}{photo_data.image_path[-4:]}"
+        ratio = image.size[0]/image.size[1]
+
+        new_x = 1000
+        new_y = math.ceil(ratio*new_x)
+
+        image = image.resize((new_x, new_y))
+        #_image_path = f"{photo_data.image_path[:4]}{i}{photo_data.image_path[-4:]}"
         # image.save(_image_path)
         meta_images.append(add_meta(image,
-                                    image_path_orig=photo_data.image_path,
+                                    image_path_orig=photo_data.image_dir,
                                     date_submission=str(photo_data.date_of_creation),
                                     date_photo_made=str(photo_data.date_of_analysis)))
 
