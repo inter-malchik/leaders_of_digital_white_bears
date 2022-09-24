@@ -16,6 +16,11 @@ class BoxCoords:
     min_y: int
     max_y: int
 
+    @staticmethod
+    def parse_from_string(s):
+        data = map(int, s.split(', '))
+        return BoxCoords((data[0], data[1]), *data[2:6])
+
 
 @dataclass
 class PhotoData:
@@ -23,6 +28,15 @@ class PhotoData:
     image_path: str
     date_of_creation: dt.datetime
     date_of_analysis: dt.datetime = dt.datetime.now()
+    bear_boxes: list = []
+
+    def scan_bear_boxes(self, path_to_paramentic_file: str):
+        f = open(path_to_paramentic_file, 'r')
+        for line in f:
+            if line and line != "\n":
+                bear_boxes.append(BoxCoords.parse_from_string(line))
+        f.close()
+
 
 
 def get_zoom_rect(bear_boxes: list):
