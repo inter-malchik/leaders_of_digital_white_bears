@@ -66,19 +66,24 @@ class Slider(QMainWindow, SliderWindow):
         cls.path = path
 
     def next(self):
-        if self.pointer!=len(self.files):
-            path = self.path + '/' + self.files[self.pointer]
+        if self.pointer!=len(self.files)-1:
+            path = self.path + '/' + self.files[self.pointer+1]
             pixmap = QPixmap(path)
             self.lbl.setPixmap(pixmap)
             self.pointer += 1
+            self.prevButton.setEnabled(True)
+        if self.pointer==len(self.files)-1:
+            self.nextButton.setEnabled(False)
 
     def prev(self):
         if self.pointer!=0:
-            self.pointer -= 1
-            path = self.path + '/' + self.files[self.pointer]
+            path = self.path + '/' + self.files[self.pointer-1]
             pixmap = QPixmap(path)
             self.lbl.setPixmap(pixmap)
-
+            self.nextButton.setEnabled(True)
+            self.pointer -= 1
+        if self.pointer==0:
+            self.prevButton.setEnabled(False)
 
     def connectSignalsSlots(self):
         self.nextButton.clicked.connect(self.next)
@@ -92,6 +97,7 @@ class Slider(QMainWindow, SliderWindow):
         self.lbl.setPixmap(pixmap)
         self.photoLayot.addWidget(self.lbl)
         self.pointer += 1
+        self.prevButton.setEnabled(False)
 
     def back(self):
         self.close()
