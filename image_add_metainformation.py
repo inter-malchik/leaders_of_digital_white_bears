@@ -1,3 +1,5 @@
+import dataclasses
+
 import PIL
 from PIL import Image
 from PIL import ImageDraw
@@ -12,13 +14,14 @@ from dataclasses import dataclass
 class BoxCoords:
     centre: tuple
     min_x: int
-    max_x: int
     min_y: int
+    max_x: int
     max_y: int
+
 
     @staticmethod
     def parse_from_string(s):
-        data = map(int, s.split(', '))
+        data = tuple(map(int, s.split(', ')))
         return BoxCoords((data[0], data[1]), *data[2:6])
 
 
@@ -28,13 +31,13 @@ class PhotoData:
     image_path: str
     date_of_creation: dt.datetime
     date_of_analysis: dt.datetime = dt.datetime.now()
-    bear_boxes: list = []
+    bear_boxes: list = dataclasses.field(default_factory=list)
 
     def scan_bear_boxes(self, path_to_paramentic_file: str):
         f = open(path_to_paramentic_file, 'r')
         for line in f:
             if line and line != "\n":
-                bear_boxes.append(BoxCoords.parse_from_string(line))
+                self.bear_boxes.append(BoxCoords.parse_from_string(line))
         f.close()
 
 
@@ -52,12 +55,12 @@ def get_zoom_rect(bear_boxes: list):
 
 
 def add_meta(image, image_path_orig='', date_submission='', date_photo_made=''):
-    im_x, im_y = image.size()
+    im_x, im_y = image.size
 
     image_bottom = PIL.Image.new("RGB", (im_x, 500), (0, 0, 0))
 
     I1 = ImageDraw.Draw(image_bottom)
-    myFont = ImageFont.truetype('Arial.ttf', 100)
+    myFont = ImageFont.truetype(r"C:\Windows\Fonts\Arial.ttf", 100)
 
     infodata = []
 
@@ -92,9 +95,9 @@ def process_image(photo_data: PhotoData):
 
     for i, box in enumerate(photo_data.bear_boxes):
         image = Image.open(photo_data.image_path)
-        image.crop((box.min_x, box.max_y, box.max_x, box.min_y))
-        _image_path = f"photo_data.image_path{i}"
-        image.save(_image_path)
+        image = image.crop((box.min_x, box.min_y, box.max_x, box.max_y))
+        _image_path = f"{photo_data.image_path[:-4]}{i}{photo_data.image_path[-4:]}"
+        #image.save(_image_path)
         meta_images.append(add_meta(image,
                                     image_path_orig=photo_data.image_path,
                                     date_submission=str(photo_data.date_of_creation),

@@ -1,9 +1,8 @@
 import os
-import integration_model_in_ui
+from yolo.yolov7 import integration_model_in_ui
 import exceptions
 import convert_to_jpeg
 from datetime import datetime
-import PIL
 from image_add_metainformation import *
 
 
@@ -21,18 +20,28 @@ class ModelWork:
         parent_directory = data_folder_path
         processing_date = datetime.now().date()
 
+        print(processed_data_path)
+
         data = os.walk(processed_data_path)
         data_list = []
-        for i in data:
-            data_list.append(i)
+
+        for rootPack, dirsPack, filesPack in data:
+            data_list.append([rootPack, dirsPack, filesPack])
+
+        for i in data_list:
+            print(i)
 
         markup_path = data_list[0][0]
-        markup_filename = data_list[0][2][0] if data_list[0][2][0][-3:] == '_xy' else data_list[0][2][1]
+        markup_filename = data_list[0][2][0] if data_list[0][2][0][-7:] == '_xy.txt' else data_list[0][2][1]
         image_path = data_list[0][0]
-        image_filename = data_list[0][2][0] if data_list[0][2][0][-3:] != '_xy' else data_list[0][2][1]
+        image_filename = data_list[0][2][0] if data_list[0][2][0][-7:] != '_xy.txt' else data_list[0][2][1]
+
 
         information = {"parent_directory": parent_directory, "processing_date": processing_date, "markup_path": markup_path + '\\' + markup_filename,
                        "markup_filename": markup_filename, "image_path": image_path + '\\' + image_filename, "image_filename": image_filename}
+
+        for i in information:
+            print(i, information[i])
 
         return information
 
@@ -41,21 +50,31 @@ class ModelWork:
 
     def puck_data_processing(self, data_folder_path):
         self.check_folder_data(data_folder_path)
+        print("chek ok")
 
         files = []
         for rootPack, dirsPack, filesPack in os.walk(data_folder_path):
             files = filesPack
 
         for file_name in files:
+            print(f"current file {file_name}")
             self.photo_processing(data_folder_path + file_name)
-            data_base = open(r"C:\Users\sahab\Desktop\yolo_test\yolov7\dataBase.txt", 'r')
-            information = self.info_pack(data_folder_path, data_base.readline())
+            data_base = open(r"C:\Users\user\Desktop\GitHub\leaders_of_digital_white_bears\yolo\yolov7\dataBase.txt", 'r')
+            information = self.info_pack(data_folder_path, r"C:\Users\user\Desktop\GitHub\leaders_of_digital_white_bears\yolo\yolov7\\" + data_base.readline())
 
             # обработа фото
 
             img_path = data_folder_path + '\\' + file_name
-            im = process_image(PhotoData(information["markup_path"], img_path, datetime.fromtimestamp(os.path.getmtime(img_path)), information["processing_date"]))
-            im.save(self.save_folder_path + '\\' + file_name)
+
+
+            temp_2 = PhotoData(information["markup_path"], img_path, datetime.fromtimestamp(os.path.getmtime(img_path)), information["processing_date"], [])
+
+            temp_2.scan_bear_boxes(information["markup_path"])
+
+            imgs = process_image(temp_2)
+
+            for i, im in enumerate(imgs):
+                im.save(self.save_folder_path + '\\' + str(i) + file_name)
 
 
 
@@ -82,7 +101,7 @@ class ModelWork:
                     filename, file_extension = os.path.splitext(file)
 
                     try:
-                        if file_extension != '.jpg':
+                        if file_extension != '.JPG':
                             if file_extension == '.png' or file_extension == '.bmp':
                                 raise exceptions.format_photo_exception(file)
                             else:
@@ -98,4 +117,3 @@ class ModelWork:
             exit(0)
 
 
-ModelWork.check_folder_data(r"C:\Users\user\Desktop\det\labels")
