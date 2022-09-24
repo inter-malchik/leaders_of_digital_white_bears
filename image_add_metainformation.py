@@ -57,10 +57,13 @@ def get_zoom_rect(bear_boxes: list):
 def add_meta(image, image_path_orig='', date_submission='', date_photo_made=''):
     im_x, im_y = image.size
 
-    image_bottom = PIL.Image.new("RGB", (im_x, 500), (0, 0, 0))
+    bottom_cum_size = math.ceil(im_y*0.4)
+    font_size = im_x * 0.05
+
+    image_bottom = PIL.Image.new("RGB", (im_x, bottom_cum_size), (0, 0, 0))
 
     I1 = ImageDraw.Draw(image_bottom)
-    myFont = ImageFont.truetype(r"C:\Windows\Fonts\Arial.ttf", 100)
+    myFont = ImageFont.truetype(r"C:\Windows\Fonts\Arial.ttf", font_size)
 
     infodata = []
 
@@ -73,16 +76,16 @@ def add_meta(image, image_path_orig='', date_submission='', date_photo_made=''):
     if date_submission:
         infodata.append((f"ДАТА ОБРАБОТКИ:", date_submission))
 
-    padding = 100 // (len(infodata) - 1) if (len(infodata)) > 1 else 100 / 2
+    padding = font_size // (len(infodata) - 1) if (len(infodata)) > 1 else font_size / 2
 
     for i in range(len(infodata)):
-        I1.text((padding, i * 100 + padding * (i + 1)), infodata[i][0], font=myFont, fill=(255, 255, 255))
-        I1.text((im_x // 2 - padding, i * 100 + padding * (i + 1)), str(infodata[i][1]), font=myFont,
+        I1.text((padding, i * font_size + padding * (i + 1)), infodata[i][0], font=myFont, fill=(255, 255, 255))
+        I1.text((im_x // 2 - padding, i * font_size + padding * (i + 1)), str(infodata[i][1]), font=myFont,
                 fill=(255, 255, 255))
 
     # image_bottom.show()
 
-    dst = Image.new('RGB', (im_x, im_y + 500))
+    dst = Image.new('RGB', (im_x, im_y + bottom_cum_size))
     dst.paste(image, (0, 0))
     dst.paste(image_bottom, (0, im_y))
 
@@ -96,8 +99,8 @@ def process_image(photo_data: PhotoData):
     for i, box in enumerate(photo_data.bear_boxes):
         image = Image.open(photo_data.image_path)
         image = image.crop((box.min_x, box.min_y, box.max_x, box.max_y))
-        _image_path = f"{photo_data.image_path[:-4]}{i}{photo_data.image_path[-4:]}"
-        #image.save(_image_path)
+        #_image_path = f"{photo_data.image_path[:-4]}{i}{photo_data.image_path[-4:]}"
+        # image.save(_image_path)
         meta_images.append(add_meta(image,
                                     image_path_orig=photo_data.image_path,
                                     date_submission=str(photo_data.date_of_creation),
