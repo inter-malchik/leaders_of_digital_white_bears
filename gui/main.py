@@ -73,7 +73,7 @@ class Window(QMainWindow, Ui_MainWindow):
 
     def handler(self):
         self.close()
-        self.loadWind = Loading(self.lineEdit.text())
+        self.loadWind = Loading()
         self.loadWind.show()
         self.slider_wind = Slider(self.lineEdit.text())
         self.loadWind.close()
